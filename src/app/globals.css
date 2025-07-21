@@ -5,6 +5,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* --border-radius: 0.75rem; */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -24,4 +25,76 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* 定义可动画的自定义属性 */
+@property --hue {
+  syntax: "<number>";
+  initial-value: 220;
+  inherits: false;
+}
+
+@property --saturation {
+  syntax: "<percentage>";
+  initial-value: 50%;
+  inherits: false;
+}
+
+@property --lightness {
+  syntax: "<percentage>";
+  initial-value: 60%;
+  inherits: false;
+}
+
+/* Error: 0.75rem 必须使用独立计算的值 */
+@property --border-radius {
+  syntax: "<length>";
+  initial-value: 12px;
+  inherits: false;
+}
+
+@property --scale {
+  syntax: "<number>";
+  initial-value: 1;
+  inherits: false;
+}
+
+/* 使用现代 CSS 的输入框样式 */
+.modern-input {
+  --border-radius: 0.75rem;
+  /* 使用注册的自定义属性 */
+  background: oklch(90% var(--saturation) var(--hue) / 0.3);
+  border: 2px solid oklch(70% calc(var(--saturation) * 0.8) var(--hue) / 0.5);
+  border-radius: var(--border-radius);
+  padding: 0.75rem 1rem;
+  transform: scale(var(--scale));
+
+  /* 现代滤镜效果 */
+  backdrop-filter: blur(10px) saturate(150%);
+
+  /* 现在可以平滑动画这些属性！ */
+  transition: --hue 0.5s ease-in-out, --saturation 0.3s ease-out, --lightness 0.3s ease-out, --border-radius 0.4s cubic-bezier(0.4, 0, 0.2, 1), --scale 0.2s ease-out;
+}
+
+.modern-input:hover {
+  --hue: 280; /* 变为紫色 */
+  --saturation: 70%;
+  --scale: 1.02;
+  --border-radius: 1rem;
+}
+
+.modern-input:focus {
+  --hue: 160; /* 变为绿色 */
+  --saturation: 80%;
+  --lightness: 50%;
+  --scale: 1.05;
+  --border-radius: 1.25rem;
+
+  background: oklch(var(--lightness) var(--saturation) var(--hue) / 0.2);
+  border-color: oklch(var(--lightness) var(--saturation) var(--hue));
+
+  /* 现代阴影效果 */
+  box-shadow: 0 0 0 3px oklch(var(--lightness) var(--saturation) var(--hue) / 0.2), 0 10px 25px -5px oklch(var(--lightness) var(--saturation) var(--hue) / 0.3);
+
+  outline: none;
 }
