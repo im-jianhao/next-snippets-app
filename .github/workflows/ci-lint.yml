@@ -1,0 +1,55 @@
+# .github/workflows/ci-lint.yml
+
+# 工作流的名称，会显示在 GitHub Actions 的界面上
+name: "代码质量检查 (Linting & Formatting)"
+
+# 触发工作流的事件
+on:
+  # 当有代码推送到任何分支时触发
+  push:
+    branches: ["main", "master", "develop"] # 可根据你的主分支名称修改
+  # 当有新的 Pull Request 或更新 Pull Request 时触发
+  pull_request:
+    branches: ["main", "master", "develop"]
+
+# 工作流包含的任务 (Jobs)
+jobs:
+  # 定义一个名为 "pre-commit-checks" 的任务
+  pre-commit-checks:
+    # 任务的名称，会显示在 GitHub Actions 的 UI 中
+    name: "Pre-commit 钩子检查"
+    # 指定任务运行的虚拟环境，ubuntu-latest 是最常用且经济的选择
+    runs-on: ubuntu-latest
+
+    # 任务的执行步骤 (Steps)
+    steps:
+      # 第一步：检出代码
+      # 使用官方的 actions/checkout@v4 来获取你的仓库代码
+      - name: 1. 检出仓库代码
+        uses: actions/checkout@v4
+
+      # 第二步：设置 Python 环境
+      # pre-commit 是一个 Python 工具，所以需要 Python 环境
+      - name: 2. 设置 Python 环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11" # 你可以指定一个版本，或使用 '3.x'
+
+      # 第三步：缓存 pre-commit 环境
+      # 这是一个优化步骤，可以显著加快后续运行速度
+      # 它会缓存 pre-commit 下载的工具和环境，下次运行时直接加载
+      - name: 3. 缓存 pre-commit 环境
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit|${{ hashFiles('.pre-commit-config.yaml') }}
+
+      # 第四步：安装并运行 pre-commit
+      # 这是核心步骤
+      - name: 4. 安装依赖并运行 pre-commit 检查
+        run: |
+          # 安装 pre-commit 工具
+          pip install pre-commit
+          # 运行检查。在 CI 环境中，我们使用 --all-files 来确保检查所有文件，
+          # 而不仅仅是本次提交修改的文件，这是最稳妥的做法。
+          pre-commit run --all-files --show-diff-on-failure
