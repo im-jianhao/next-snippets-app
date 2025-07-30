@@ -1,7 +1,15 @@
 // import SnippetDelButton from "@/components/SnippetDelButton";
 import { deleteSnippet } from "@/actions";
 import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+
+export const generateStaticParams = async () => {
+  const snippets = await prisma.snippet.findMany();
+  return snippets.map((snippet) => ({
+    id: snippet.id,
+  }));
+};
 
 interface PageProps {
   params: {
@@ -29,7 +37,9 @@ export default async function Page({ params }: PageProps) {
       <div className="flex justify-between items-center my-4">
         <h1 className="text-2xl font-bold">{snippet?.title}</h1>
         <div className="flex gap-2">
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-md">Edit</button>
+          <Link href={`/snippet/${snippet.id}/edit`} className="bg-blue-500 text-white px-4 py-2 rounded-md">
+            Edit
+          </Link>
           {/* 1、通过组件删除 */}
           {/* <SnippetDelButton id={snippet.id} /> */}
           {/* 2、通过action删除 */}

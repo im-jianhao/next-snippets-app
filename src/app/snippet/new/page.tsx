@@ -1,30 +1,20 @@
-import { prisma } from "@/lib/prisma";
-import { redirect } from "next/navigation";
+"use client";
+import { useFormState } from "react-dom";
+import { createSnippet } from "@/actions";
+import { CreateSnippetFormState } from "@/actions/types";
+
+const initialState: CreateSnippetFormState = {
+  success: false,
+  message: "",
+  errors: null,
+};
 
 export default function NewSnippetPage() {
-  const handleSubmit = async (formData: FormData) => {
-    "use server";
-    const title = formData.get("title");
-    const code = formData.get("code");
-
-    const res = await prisma.snippet.create({
-      data: {
-        title: title as string,
-        code: code as string,
-      },
-    });
-    console.log("res", res);
-    redirect("/");
-  };
-
+  const [state, formAction] = useFormState(createSnippet, initialState);
+  // TODO button按钮使用useFormStatus优化
   return (
     <div className="max-w-2xl mx-auto mt-10 space-y-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">现代 CSS 输入框演示</h1>
-        <p className="text-gray-600">体验 @property 和 color-mix() 的强大功能</p>
-      </div>
-
-      <form className="space-y-6" action={handleSubmit}>
+      <form className="space-y-6" action={formAction}>
         <div className="space-y-4">
           <div className="space-y-2">
             <label className="block text-sm font-medium" htmlFor="title">
@@ -43,7 +33,7 @@ export default function NewSnippetPage() {
             <textarea id="code" className="modern-input w-full min-h-[120px] font-mono" placeholder="在这里输入你的代码..." name="code" />
           </div>
         </div>
-
+        <div>{state.message}</div>
         <button
           className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
           type="submit"

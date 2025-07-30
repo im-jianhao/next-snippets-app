@@ -1,6 +1,7 @@
 "use client";
 
 import { deleteSnippet } from "@/actions";
+import { startTransition } from "react";
 
 interface SnippetDelButtonProps {
   id: string;
@@ -8,7 +9,9 @@ interface SnippetDelButtonProps {
 
 export default function SnippetDelButton({ id }: SnippetDelButtonProps) {
   const handleDelete = async () => {
-    await deleteSnippet(id);
+    startTransition(async () => {
+      await deleteSnippet(id);
+    });
   };
 
   return (
